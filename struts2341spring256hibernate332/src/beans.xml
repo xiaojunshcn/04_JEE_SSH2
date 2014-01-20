@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-2.5.xsd
+		http://www.springframework.org/schema/aop
+		http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+		
+	<!-- scan the package of com.joe, including sub packages -->
+	<context:component-scan base-package="com.joe" />
+	
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+		<property name="driverClass" value="org.gjt.mm.mysql.Driver"/>
+		<property name="jdbcUrl" value="jdbc:mysql://localhost:3306/joexiao?useUnicode=true&amp;characterEncoding=UTF-8"/>
+		<property name="user" value="root"/>
+		<property name="password" value="admin"/>
+		<!-- 初始化时获取的连接数，取值在minPoolSize maxPoolSize之间。default：3 -->
+		<property name="initialPoolSize" value="1"/>
+		<property name="minPoolSize" value="1"/>
+		<!-- 最大连接数，default：15 -->
+		<property name="maxPoolSize" value="300"/>
+		<!-- 最大空闲时间，60秒内未使用则连接丢弃。若为0则永不丢弃。default：0 -->
+		<property name="maxIdleTime" value="60"/>
+		<!-- 当连接池中的连接耗尽时，c3p0一次同时获取的连接数。default:3 -->
+		<property name="acquireIncrement" value="5"/>
+		<!-- 每60秒检查所有连接池中的空闲连接。default：0 -->
+		<property name="idleConnectionTestPeriod" value="60"/>
+	</bean>
+	
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"/>
+		<property name="mappingResources">
+            <list>
+                <value>com/joe/bean/Employee.hbm.xml</value>
+                <!-- value>entities/UserToMessage.hbm.xml</value>
+                <value>entities/Family.hbm.xml</value>
+                <value>entities/Message.hbm.xml</value>
+                <value>entities/User.hbm.xml</value-->
+            </list>
+        </property>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
+                <prop key="hibernate.hbm2ddl.auto">update</prop>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.jdbc.batch_size">10</prop>
+                <prop key="hibernate.format_sql">false</prop>
+            </props>
+        </property>
+        
+	</bean>
+	
+	<!-- transaction manager -->
+    <bean id="txManager"
+        class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+        <property name="sessionFactory">
+            <ref bean="sessionFactory" />
+        </property>
+    </bean>
+    
+    <!-- 使用基于注解方式配置事务 -->
+    <tx:annotation-driven transaction-manager="txManager"/>
+</beans>

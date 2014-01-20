@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+	"-//Apache Software Foundation//DTD Struts Configuration 2.3//EN"
+	"http://struts.apache.org/dtds/struts-2.3.dtd">
+
+<struts>
+	<!--constant name="struts.enable.DynamicMethodInvocation" value="false" />
+    <constant name="struts.devMode" value="false" /-->
+	
+	<constant name="struts.ui.theme" value="simple"/>
+	
+	<!-- 使用spring创建对象工厂类替换掉struts的默认工厂类 -->
+	<constant name="struts.objectFactory" value="spring" />
+	
+	<package name="employee" namespace="/employee" extends="struts-default">
+		<!-- struts2 是写class的 package + class name, spring的话是类名的首字母小写 -->
+		<action name="list" class="employeeAction">
+			<result name="list">/WEB-INF/page/employee.jsp</result>
+		</action>
+		
+		<action name="manage_*" class="employeeManageAction" method="{1}">
+			<result name="add">/WEB-INF/page/employeeAdd.jsp</result>
+			<result name="message">/WEB-INF/page/message.jsp</result>
+		</action>
+	</package>
+</struts>
